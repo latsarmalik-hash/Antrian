@@ -1,83 +1,93 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Cek Nomor Antrian</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: white;
-        }
+<meta charset="UTF-8">
+<title>Sistem Antrian</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        .card {
-            background: white;
-            color: #333;
-            padding: 40px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-            width: 90%;
-            max-width: 400px;
-        }
+<style>
+body {
+    margin:0;
+    font-family: Arial;
+    background: linear-gradient(135deg,#1e3c72,#2a5298);
+    color:white;
+    text-align:center;
+}
 
-        h1 {
-            margin: 0;
-            font-size: 22px;
-        }
+.container {
+    margin-top:60px;
+}
 
-        #number {
-            font-size: 70px;
-            font-weight: bold;
-            margin-top: 20px;
-            color: #2a5298;
-        }
+.card {
+    background:white;
+    color:#333;
+    padding:30px;
+    border-radius:15px;
+    display:inline-block;
+    min-width:300px;
+}
 
-        .footer {
-            margin-top: 20px;
-            font-size: 12px;
-            color: gray;
-        }
-    </style>
+#number {
+    font-size:70px;
+    margin:20px 0;
+    color:#2a5298;
+}
+
+button {
+    padding:10px 20px;
+    margin:5px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.admin-panel {
+    margin-top:20px;
+}
+</style>
 </head>
 <body>
 
-<div class="card">
-    <h1>Nomor Antrian Saat Ini</h1>
-    <div id="number">Loading...</div>
-    <div class="footer">Auto update setiap 10 detik</div>
+<div class="container">
+    <div class="card">
+        <h2>Nomor Antrian Saat Ini</h2>
+        <div id="number">Loading...</div>
+    </div>
+
+    <div class="card admin-panel">
+        <h3>Admin Panel</h3>
+        <input type="number" id="newNumber" placeholder="Masukkan Nomor Baru">
+        <br><br>
+        <button onclick="updateNumber()">Update Nomor</button>
+    </div>
 </div>
 
 <script>
-    const sheetID = "1FiRTM9smgyGFdUPPgP9OyEcCUddIAHBKNh4NqVDEBmw";
-    const sheetName = "Sheet1"; // ganti kalau nama tab berbeda
 
-    const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
+const scriptURL = "https://script.google.com/macros/s/AKfycby5BCNdTUN1PZuePuFfzTfnFhjzNgFSukLRaqhYUUx9Xe7djo2ofYSQS88jUg125MXCVw/exec";
 
-    function loadData() {
-        fetch(url)
-            .then(response => response.text())
-            .then(data => {
-                const json = JSON.parse(data.substring(47).slice(0, -2));
-                const number = json.table.rows[0].c[1].v;
-                document.getElementById("number").innerText = number;
-            })
-            .catch(error => {
-                console.error(error);
-                document.getElementById("number").innerText = "Tidak Bisa Akses Data";
-            });
-    }
+function loadNumber(){
+    fetch(`${scriptURL}?action=get`)
+    .then(res=>res.text())
+    .then(data=>{
+        document.getElementById("number").innerText = data;
+    });
+}
 
-    loadData();
-    setInterval(loadData, 10000);
+function updateNumber(){
+    const newNumber = document.getElementById("newNumber").value;
+    fetch(`${scriptURL}?action=set&number=${newNumber}`)
+    .then(res=>res.text())
+    .then(()=>{
+        loadNumber();
+        alert("Nomor berhasil diperbarui");
+    });
+}
+
+loadNumber();
+setInterval(loadNumber, 5000);
+
 </script>
 
 </body>
