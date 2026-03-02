@@ -1,56 +1,83 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Cek Nomor Antrian</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <style>
         body {
-            font-family: Arial;
-            text-align: center;
-            margin-top: 100px;
-            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
         }
-        .box {
+
+        .card {
             background: white;
-            padding: 30px;
-            border-radius: 10px;
-            display: inline-block;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            color: #333;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
         }
+
         h1 {
-            font-size: 24px;
+            margin: 0;
+            font-size: 22px;
         }
+
         #number {
-            font-size: 60px;
-            color: green;
+            font-size: 70px;
+            font-weight: bold;
             margin-top: 20px;
+            color: #2a5298;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: gray;
         }
     </style>
 </head>
 <body>
 
-<div class="box">
+<div class="card">
     <h1>Nomor Antrian Saat Ini</h1>
     <div id="number">Loading...</div>
+    <div class="footer">Auto update setiap 10 detik</div>
 </div>
 
 <script>
-const sheetID = "1FiRTM9smgyGFdUPPgP9OyEcCUddIAHBKNh4NqVDEBmw";
-const sheetName = "Sheet1"; // ganti kalau nama tab beda
+    const sheetID = "1FiRTM9smgyGFdUPPgP9OyEcCUddIAHBKNh4NqVDEBmw";
+    const sheetName = "Sheet1"; // ganti kalau nama tab berbeda
 
-const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq&sheet=${sheetName}`;
+    const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
 
-fetch(url)
-  .then(res => res.text())
-  .then(data => {
-    const json = JSON.parse(data.substring(47).slice(0, -2));
-    const number = json.table.rows[0].c[1].v;
-    document.getElementById("number").innerText = number;
-  })
-  .catch(err => {
-    console.error(err);
-    document.getElementById("number").innerText = "Tidak Bisa Akses Data";
-  });
+    function loadData() {
+        fetch(url)
+            .then(response => response.text())
+            .then(data => {
+                const json = JSON.parse(data.substring(47).slice(0, -2));
+                const number = json.table.rows[0].c[1].v;
+                document.getElementById("number").innerText = number;
+            })
+            .catch(error => {
+                console.error(error);
+                document.getElementById("number").innerText = "Tidak Bisa Akses Data";
+            });
+    }
+
+    loadData();
+    setInterval(loadData, 10000);
 </script>
 
 </body>
