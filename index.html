@@ -1,49 +1,100 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Admin Antrian</title>
+<meta charset="UTF-8">
+<title>Nomor Antrian</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 body {
-  font-family: Arial;
-  text-align:center;
-  background:#f2f2f2;
+    margin:0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    color:white;
+    text-align:center;
 }
-input, button {
-  padding:10px;
-  margin:5px;
+
+.container {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    padding:50px;
+    border-radius:25px;
+    box-shadow:0 25px 60px rgba(0,0,0,0.5);
+    width:90%;
+    max-width:600px;
+}
+
+h1 {
+    font-weight:500;
+    letter-spacing:1px;
+}
+
+.number {
+    font-size:130px;
+    font-weight:bold;
+    margin:40px 0;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.blink {
+    animation: pop 0.4s ease;
+}
+
+@keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.25); color: #00ffcc; }
+    100% { transform: scale(1); }
+}
+
+.update-time {
+    font-size:14px;
+    opacity:0.8;
 }
 </style>
 </head>
 <body>
 
-<h2>Admin Panel</h2>
-
-<input type="password" id="password" placeholder="Password">
-<br>
-<input type="number" id="number" placeholder="Nomor Baru">
-<br>
-<button onclick="updateNumber()">Update</button>
-
-<p id="status"></p>
+<div class="container">
+    <h1>Nomor Antrian Saat Ini</h1>
+    <div id="number" class="number">Loading...</div>
+    <div class="update-time" id="time"></div>
+</div>
 
 <script>
 const scriptURL = "https://script.google.com/macros/s/AKfycbypb4qhwig6XkXp5bxgJ3rc0K3MQZC8jJjNnO0_aWucZrPgnBy8oak3BCWTPC6wxi-4pg/exec";
 
-function updateNumber(){
-  const number = document.getElementById("number").value;
-  const password = document.getElementById("password").value;
+let lastNumber = null;
 
-  fetch(`${scriptURL}?action=set&number=${number}&password=${password}`)
-  .then(res=>res.text())
-  .then(data=>{
-    if(data === "Success"){
-      document.getElementById("status").innerText = "Berhasil diupdate";
-    } else {
-      document.getElementById("status").innerText = "Password salah!";
-    }
-  });
+function loadNumber(){
+    fetch(`${scriptURL}?action=get`)
+    .then(res=>res.text())
+    .then(data=>{
+        if(data !== lastNumber){
+            document.getElementById("number").innerText = data;
+            document.getElementById("number").classList.add("blink");
+
+            setTimeout(()=>{
+                document.getElementById("number").classList.remove("blink");
+            },400);
+
+            lastNumber = data;
+        }
+
+        const now = new Date();
+        document.getElementById("time").innerText =
+            "Update terakhir: " + now.toLocaleTimeString();
+    })
+    .catch(()=>{
+        document.getElementById("number").innerText = "Koneksi Error";
+    });
 }
+
+loadNumber();
+setInterval(loadNumber, 5000);
 </script>
 
 </body>
