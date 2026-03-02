@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Nomor Antrian</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+  font-family: Arial;
+  text-align:center;
+  background:#1e3c72;
+  color:white;
+}
+#number {
+  font-size:80px;
+  margin-top:50px;
+}
+</style>
+</head>
+<body>
+
+<h2>Nomor Antrian Saat Ini</h2>
+<div id="number">Loading...</div>
+
+<script>
+const scriptURL = "PASTE_WEB_APP_URL_KAMU";
+
+function loadNumber(){
+  fetch(`${scriptURL}?action=get`)
+  .then(res=>res.text())
+  .then(data=>{
+    document.getElementById("number").innerText = data;
+  });
+}
+
+loadNumber();
+setInterval(loadNumber, 5000);
+</script>
+
+</body>
+</html>
